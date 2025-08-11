@@ -22,10 +22,11 @@ pub fn show() -> Result<Vec<Note>, duckdb::Error> {
     let mut stmt = conn.prepare("SELECT * FROM notes")?;
     let notes_iter = stmt.query_map([], |row| {
         Ok(Note {
-            subject: row.get(0)?,
-            content: row.get(1)?,
-            due_date: row.get::<_, String>(2)?,
-            inserted_at: Some(row.get::<_, String>(3).unwrap()),
+            id: Some(row.get::<_, i32>(0).unwrap()),
+            subject: row.get(1)?,
+            content: row.get(2)?,
+            due_date: row.get::<_, String>(3)?,
+            inserted_at: Some(row.get::<_, String>(4).unwrap()),
         })
     })?;
 
@@ -35,7 +36,7 @@ pub fn show() -> Result<Vec<Note>, duckdb::Error> {
 
 fn save_note_to_db(conn: &Connection, note: Note) {
     let stmt = conn.prepare(
-        "INSERT INTO notes(subject, content,  due_date) VALUES (?, ?, ?)"
+        "INSERT INTO notes(id, subject, content,  due_date) VALUES (nextval('seq_notes_id'), ?, ?, ?)"
     );
 
     let _ = stmt.expect("Could not insert into table").query(params![
@@ -47,10 +48,15 @@ fn save_note_to_db(conn: &Connection, note: Note) {
 
 fn create_table(conn: &Connection) {
     let stmt = conn.prepare(
-        "CREATE TABLE notes(subject TEXT, content TEXT, due_date VARCHAR, inserted_at VARCHAR DEFAULT CAST(NOW() AS VARCHAR))"
+        "CREATE TABLE notes(id INTEGER PRIMARY KEY, subject TEXT, content TEXT, due_date VARCHAR, inserted_at VARCHAR DEFAULT CAST(NOW() AS VARCHAR))"
     );
 
     let _ = stmt.expect("Could not create table").query(params![]);
+    let create_sequence = conn.prepare(
+        "CREATE SEQUENCE seq_notes_id START 1;"
+    );
+
+    let _ = create_sequence.expect("Could not create seq_notes_id").query(params![]);
 }
 
 fn table_exists(conn: &Connection, table_name: &str) -> Result<bool, duckdb::Error> {

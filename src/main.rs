@@ -74,10 +74,11 @@ fn list() {
 
     let mut table = Table::new();
 
-    table.add_row(row!["Subject", "Content", "Due Date", "Inserted At"]);
+    table.add_row(row!["Id", "Subject", "Content", "Due Date", "Inserted At"]);
 
     for note in notes {
         table.add_row(Row::new(vec![
+            Cell::new(&note.id.unwrap().to_string()),
             Cell::new(&note.subject),
             Cell::new(&note.content),
             Cell::new(&note.due_date),
