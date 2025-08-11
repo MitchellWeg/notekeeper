@@ -3,7 +3,6 @@ mod db;
 
 use clap::Parser;
 use chrono::NaiveDate;
-use note::*;
 use prettytable::{Table, Row, row, Cell};
 
 #[derive(Parser, Debug)]
