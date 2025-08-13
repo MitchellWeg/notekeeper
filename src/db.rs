@@ -16,10 +16,17 @@ pub fn save_note(note: Note) {
 }
 
 // TODO: should take an optional filter.
-pub fn show() -> Result<Vec<Note>, duckdb::Error> {
+pub fn show(filter: Option<String>) -> Result<Vec<Note>, duckdb::Error> {
     let conn = Connection::open("notes.db")?;
 
-    let mut stmt = conn.prepare("SELECT * FROM notes")?;
+    let query: String = if filter.is_some() {
+        format!("SELECT * FROM notes WHERE content LIKE '%{}%'", filter.unwrap())
+    }
+    else {
+        "SELECT * FROM notes".to_string()
+    };
+
+    let mut stmt = conn.prepare(&query)?;
     let notes_iter = stmt.query_map([], |row| {
         Ok(Note {
             id: Some(row.get::<_, i32>(0).unwrap()),

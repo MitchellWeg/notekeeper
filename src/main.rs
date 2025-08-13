@@ -24,6 +24,10 @@ struct Args {
     #[arg(short, long)]
     list: bool,
 
+    // -f
+    #[arg(short, long)]
+    filter: Option<String>,
+
     #[arg()]
     rest: Vec<String>,
 }
@@ -34,7 +38,7 @@ fn main() {
     let mut due_date: String = String::from("NULL");
 
     if args.list {
-        list();
+        list(args.filter);
         return;
     }
 
@@ -60,8 +64,8 @@ fn main() {
     db::save_note(parsed);
 }
 
-fn list() {
-    let _notes = db::show();
+fn list(filter: Option<String>) {
+    let _notes = db::show(filter);
 
     let notes = match _notes {
         Ok(n) => n,
