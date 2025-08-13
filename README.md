@@ -9,7 +9,11 @@ Blazingly fast Terminal note-keeper 🚀
 ```
 
 ```sh
-./notes --subject foo --content bar --due-date 04-08-2025
+./notes --content bar --due-date 04-08-2025
+```
+
+```sh
+./notes "this is my long note" 
 ```
 
 ## Build from source

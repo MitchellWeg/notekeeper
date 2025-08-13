@@ -23,6 +23,9 @@ struct Args {
     // -l
     #[arg(short, long)]
     list: bool,
+
+    #[arg()]
+    rest: Vec<String>,
 }
 
 
@@ -41,7 +44,13 @@ fn main() {
         due_date = parsed_date;
     }
 
-    let note_content = args.content.unwrap();
+    let note_content = if args.rest.len() > 0 {
+        args.rest.get(0).unwrap().to_string()
+    }
+    else {
+        args.content.unwrap()
+    };
+
 
     let parsed = note::parse_note(
         note_content,
