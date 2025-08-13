@@ -8,10 +8,6 @@ use prettytable::{Table, Row, row, Cell};
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    // -s
-    #[arg(short, long)]
-    subject: Option<String>,
-
     // -c 
     #[arg(short, long)]
     content: Option<String>,
@@ -32,19 +28,12 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let mut note_subject: String = String::from("NULL");
     let mut due_date: String = String::from("NULL");
 
     if args.list {
         list();
         return;
     }
-
-    // Note that subject might be empty.
-    if let Some(s) = &args.subject {
-        note_subject = s.to_string();
-    }
-
 
     if let Some(d) = &args.due_date {
         let parsed_date = d.to_string();        
@@ -55,7 +44,6 @@ fn main() {
     let note_content = args.content.unwrap();
 
     let parsed = note::parse_note(
-        note_subject,
         note_content,
         due_date,
     );
@@ -73,12 +61,11 @@ fn list() {
 
     let mut table = Table::new();
 
-    table.add_row(row!["Id", "Subject", "Content", "Due Date", "Inserted At"]);
+    table.add_row(row!["Id", "Content", "Due Date", "Inserted At"]);
 
     for note in notes {
         table.add_row(Row::new(vec![
             Cell::new(&note.id.unwrap().to_string()),
-            Cell::new(&note.subject),
             Cell::new(&note.content),
             Cell::new(&note.due_date),
             Cell::new(&note.inserted_at.unwrap())]));
